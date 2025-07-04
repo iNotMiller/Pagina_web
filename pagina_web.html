@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Baúl de la Moda - Estilo Falabella</title>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f7f7f7; }
+    header {
+      background: #0046ab;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo { font-size: 24px; font-weight: bold; }
+    .buscador input {
+      padding: 8px;
+      width: 300px;
+      border-radius: 4px;
+      border: none;
+    }
+    .menu-usuario button {
+      background: #fff;
+      border: none;
+      padding: 8px 12px;
+      margin-left: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    nav {
+      background: #e0e0e0;
+      padding: 10px 20px;
+      display: flex;
+      gap: 20px;
+    }
+    nav a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+    .filtros {
+      padding: 15px;
+      max-width: 200px;
+      background: #fff;
+    }
+    .contenido {
+      display: flex;
+      gap: 20px;
+      margin: 20px;
+    }
+    .productos {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+      flex: 1;
+    }
+    .producto {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      overflow: hidden;
+      text-align: center;
+      cursor: pointer;
+    }
+    .producto img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+    .producto h3 { margin: 10px 0 5px; font-size: 16px; }
+    .producto p { color: #666; font-weight: bold; }
+    .producto button {
+      background: #0046ab;
+      color: white;
+      border: none;
+      padding: 10px;
+      width: 100%;
+      cursor: pointer;
+    }
+    #carrito {
+      background: #fff;
+      padding: 15px;
+      margin: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    #detalle-producto {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      z-index: 1000;
+      max-width: 400px;
+    }
+    #detalle-producto img {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🛍️ Baúl de la Moda</div>
+  <div class="buscador"><input type="text" id="busqueda" placeholder="Buscar productos..." oninput="buscarProductos()"></div>
+  <div class="menu-usuario">
+    <button onclick="mostrarLogin()">Iniciar sesión</button>
+    <button onclick="mostrarRegistro()">Registrarse</button>
+  </div>
+</header>
+
+<nav>
+  <a href="#">Mujer</a>
+  <a href="#">Hombre</a>
+  <a href="#">Calzado</a>
+  <a href="#">Accesorios</a>
+</nav>
+
+<div class="contenido">
+  <aside class="filtros">
+    <h4>Filtrar por:</h4>
+    <label><input type="checkbox" value="Mujer"> Mujer</label><br>
+    <label><input type="checkbox" value="Hombre"> Hombre</label><br>
+    <label><input type="checkbox" value="Calzado"> Calzado</label><br>
+    <label><input type="checkbox" value="Accesorios"> Accesorios</label>
+  </aside>
+
+  <section class="productos" id="productos"></section>
+</div>
+
+<div id="carrito">
+  <h3>🛒 Tu Carrito</h3>
+  <ul id="lista-carrito"></ul>
+  <p id="total">Total: S/ 0</p>
+  <button onclick="finalizarCompra()">Finalizar compra</button>
+</div>
+
+<div id="overlay" onclick="cerrarDetalle()"></div>
+<div id="detalle-producto"></div>
+
+<script>
+  const productos = [
+    {
+      nombre: "Camiseta Mujer",
+      categoria: "Mujer",
+      precio: 29,
+      descripcion: "Camiseta de algodón cómoda y fresca.",
+      imagen: "https://cdn.pixabay.com/photo/2016/11/19/14/00/t-shirt-1836123_1280.jpg"
+    },
+    {
+      nombre: "Pantalón Hombre",
+      categoria: "Hombre",
+      precio: 49,
+      descripcion: "Pantalón formal ideal para oficina.",
+      imagen: "https://cdn.pixabay.com/photo/2015/10/20/19/33/pants-997346_1280.jpg"
+    },
+    {
+      nombre: "Zapatillas",
+      categoria: "Calzado",
+      precio: 79,
+      descripcion: "Zapatillas deportivas de gran durabilidad.",
+      imagen: "https://cdn.pixabay.com/photo/2016/11/21/15/46/shoes-1840615_1280.jpg"
+    },
+    {
+      nombre: "Bolso",
+      categoria: "Accesorios",
+      precio: 39,
+      descripcion: "Bolso de cuero elegante para toda ocasión.",
+      imagen: "https://cdn.pixabay.com/photo/2016/11/19/14/01/handbag-1836070_1280.jpg"
+    }
+  ];
+
+  let carrito = [];
+
+  function mostrarProductos(filtro = [], termino = "") {
+    const cont = document.getElementById("productos");
+    cont.innerHTML = "";
+    let filtrados = filtro.length ? productos.filter(p => filtro.includes(p.categoria)) : productos;
+    if (termino) {
+      filtrados = filtrados.filter(p => p.nombre.toLowerCase().includes(termino.toLowerCase()));
+    }
+    filtrados.forEach((producto, i) => {
+      const card = document.createElement("div");
+      card.className = "producto";
+      card.innerHTML = `
+        <img src="${producto.imagen}" alt="${producto.nombre}">
+        <h3>${producto.nombre}</h3>
+        <p>S/ ${producto.precio}</p>
+        <button onclick="agregarAlCarrito(${i})">Agregar</button>
+      `;
+      card.onclick = () => mostrarDetalle(producto);
+      cont.appendChild(card);
+    });
+  }
+
+  function mostrarDetalle(producto) {
+    const detalle = document.getElementById("detalle-producto");
+    const overlay = document.getElementById("overlay");
+    detalle.innerHTML = `
+      <img src="${producto.imagen}" alt="${producto.nombre}">
+      <h2>${producto.nombre}</h2>
+      <p>${producto.descripcion}</p>
+      <p><strong>Precio: S/ ${producto.precio}</strong></p>
+      <button onclick="agregarAlCarritoDesdeDetalle('${producto.nombre}')">Agregar al carrito</button>
+    `;
+    overlay.style.display = "block";
+    detalle.style.display = "block";
+  }
+
+  function cerrarDetalle() {
+    document.getElementById("detalle-producto").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
+  }
+
+  function agregarAlCarritoDesdeDetalle(nombreProducto) {
+    const producto = productos.find(p => p.nombre === nombreProducto);
+    carrito.push(producto);
+    actualizarCarrito();
+    cerrarDetalle();
+  }
+
+  function buscarProductos() {
+    const termino = document.getElementById("busqueda").value;
+    const activos = Array.from(document.querySelectorAll(".filtros input:checked")).map(c => c.value);
+    mostrarProductos(activos, termino);
+  }
+
+  function agregarAlCarrito(index) {
+    carrito.push(productos[index]);
+    actualizarCarrito();
+  }
+
+  function actualizarCarrito() {
+    const lista = document.getElementById("lista-carrito");
+    const total = document.getElementById("total");
+    lista.innerHTML = "";
+    let suma = 0;
+    carrito.forEach(item => {
+      const li = document.createElement("li");
+      li.textContent = `${item.nombre} - S/ ${item.precio}`;
+      lista.appendChild(li);
+      suma += item.precio;
+    });
+    total.textContent = `Total: S/ ${suma}`;
+  }
+
+  function finalizarCompra() {
+    if (carrito.length === 0) return alert("Tu carrito está vacío");
+    alert("Gracias por tu compra 🎉");
+    carrito = [];
+    actualizarCarrito();
+  }
+
+  document.querySelectorAll(".filtros input").forEach(chk => {
+    chk.addEventListener("change", buscarProductos);
+  });
+
+  mostrarProductos();
+</script>
+
+</body>
+</html>
