@@ -16,7 +16,7 @@
       align-items: center;
       justify-content: space-between;
     }
-    .logo { font-size: 24px; font-weight: bold;italics }
+    .logo { font-size: 20px; font-weight: bold;italics }
     .buscador input {
       padding: 8px;
       width: 300px;
@@ -33,7 +33,7 @@
     }
     nav {
       background: #e0e0e0;
-      padding: 10px 20px;
+      padding: 10px 24px;
       display: flex;
       gap: 20px;
     }
@@ -119,8 +119,8 @@
 <body>
 
 <header>
-  <div class="logo">🛍️ Baúl de la Moda</div>
-  <div class="buscador"><input type="text" id="busqueda" placeholder="Buscar productos..." oninput="buscarProductos()"></div>
+  <div class="logo">🛍️ El Baúl de la Moda</div>
+  <div class="buscador"><input type="text" id="busqueda" placeholder="Buscar productos 🔎" oninput="buscarProductos()"></div>
   <div class="menu-usuario">
     <button onclick="mostrarLogin()">Iniciar sesión</button>
     <button onclick="mostrarRegistro()">Registrarse</button>
@@ -264,7 +264,7 @@
 
   function finalizarCompra() {
     if (carrito.length === 0) return alert("Tu carrito está vacío");
-    alert("Gracias por tu compra 🎉");
+    alert("Gracias por tu compra 🌟");
     carrito = [];
     actualizarCarrito();
   }
